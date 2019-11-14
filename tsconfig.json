@@ -1,6 +1,6 @@
 {
     "compilerOptions": {
-        "outDir": "./build-ts",
+        "outDir": "src",
         "declaration": true,
         "allowUnreachableCode": false,
         "noImplicitAny": true,

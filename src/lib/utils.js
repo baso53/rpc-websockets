@@ -10,30 +10,20 @@ const errors = new Map([
     [-32605, "Method forbidden"],
     [-32700, "Parse error"]
 ])
-
-interface IRPCError {
-    code: number;
-    message: string;
-    data?: string;
-}
-
 /**
  * Creates a JSON-RPC 2.0-compliant error.
  * @param {Number} code - error code
  * @param {String} details - error details
  * @return {Object}
  */
-function createError(code: number, details?: string)
+function createError(code, details)
 {
-    const error: IRPCError = {
+    const error = {
         code: code,
         message: errors.get(code) || "Internal Server Error"
     }
-
     if (details)
         error["data"] = details
-
     return error
 }
-
 export { createError }

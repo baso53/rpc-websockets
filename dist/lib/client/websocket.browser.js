@@ -9,11 +9,11 @@ var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefau
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = void 0;
+exports["default"] = void 0;
 
 var _eventemitter = _interopRequireDefault(require("eventemitter3"));
 
-class WebSocketBrowserImpl extends _eventemitter.default {
+class WebSocketBrowserImpl extends _eventemitter["default"] {
   /** Instantiate a WebSocket class
    * @constructor
    * @param {String} address - url to a websocket server
@@ -22,17 +22,26 @@ class WebSocketBrowserImpl extends _eventemitter.default {
    * @return {WebSocketBrowserImpl} - returns a WebSocket instance
    */
   constructor(address, options, protocols) {
+    var _this;
+
     super();
+    _this = this;
     this.socket = new window.WebSocket(address, protocols);
 
-    this.socket.onopen = () => this.emit("open");
+    this.socket.onopen = function () {
+      return _this.emit("open");
+    };
 
-    this.socket.onmessage = event => this.emit("message", event.data);
+    this.socket.onmessage = function (event) {
+      return _this.emit("message", event.data);
+    };
 
-    this.socket.onerror = error => this.emit("error", error);
+    this.socket.onerror = function (error) {
+      return _this.emit("error", error);
+    };
 
-    this.socket.onclose = event => {
-      this.emit("close", event.code, event.reason);
+    this.socket.onclose = function (event) {
+      _this.emit("close", event.code, event.reason);
     };
   }
   /**
@@ -46,7 +55,7 @@ class WebSocketBrowserImpl extends _eventemitter.default {
 
 
   send(data, optionsOrCallback, callback) {
-    const cb = callback || optionsOrCallback;
+    var cb = callback || optionsOrCallback;
 
     try {
       this.socket.send(data);
@@ -75,4 +84,4 @@ class WebSocketBrowserImpl extends _eventemitter.default {
 
 }
 
-exports.default = WebSocketBrowserImpl;
+exports["default"] = WebSocketBrowserImpl;

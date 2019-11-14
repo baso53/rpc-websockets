@@ -10,7 +10,11 @@ var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefau
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = void 0;
+exports["default"] = void 0;
+
+var _regenerator = _interopRequireDefault(require("@babel/runtime/regenerator"));
+
+var _typeof2 = _interopRequireDefault(require("@babel/runtime/helpers/typeof"));
 
 var _assertArgs = _interopRequireDefault(require("assert-args"));
 
@@ -18,23 +22,34 @@ var _eventemitter = _interopRequireDefault(require("eventemitter3"));
 
 var _circularJson = _interopRequireDefault(require("circular-json"));
 
-class CommonClient extends _eventemitter.default {
+class CommonClient extends _eventemitter["default"] {
   /**
    * Instantiate a Client class.
    * @constructor
-   * @param {function} WebSocketConstructible - WebSocket implementation constructor
+   * @param {WebSocketConstructible} WebSocketConstructible - WebSocket implementation class
    * @param {String} address - url to a websocket server
    * @param {Object} options - ws options object with reconnect parameters
    * @param {Function} generate_request_id - custom generation request Id
    * @return {CommonClient}
    */
-  constructor(WebSocketConstructible, address = "ws://localhost:8080", {
-    autoconnect = true,
-    reconnect = true,
-    reconnect_interval = 1000,
-    max_reconnects = 5
-  } = {}, generate_request_id) {
+  constructor(WebSocketConstructible) {
+    var _this;
+
+    var address = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "ws://localhost:8080";
+
+    var _ref = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {},
+        _ref$autoconnect = _ref.autoconnect,
+        autoconnect = _ref$autoconnect === void 0 ? true : _ref$autoconnect,
+        _ref$reconnect = _ref.reconnect,
+        reconnect = _ref$reconnect === void 0 ? true : _ref$reconnect,
+        _ref$reconnect_interv = _ref.reconnect_interval,
+        reconnect_interval = _ref$reconnect_interv === void 0 ? 1000 : _ref$reconnect_interv,
+        _ref$max_reconnects = _ref.max_reconnects,
+        max_reconnects = _ref$max_reconnects === void 0 ? 5 : _ref$max_reconnects;
+
+    var generate_request_id = arguments.length > 3 ? arguments[3] : undefined;
     super();
+    _this = this;
     this.WebSocketConstructible = WebSocketConstructible;
     this.queue = {};
     this.rpc_id = 0;
@@ -47,7 +62,9 @@ class CommonClient extends _eventemitter.default {
     this.max_reconnects = max_reconnects;
     this.current_reconnects = 0;
 
-    this.generate_request_id = generate_request_id || (() => ++this.rpc_id);
+    this.generate_request_id = generate_request_id || function () {
+      return ++_this.rpc_id;
+    };
 
     if (this.autoconnect) this._connect(this.address, this.options);
   }
@@ -75,36 +92,41 @@ class CommonClient extends _eventemitter.default {
 
 
   call(method, params, timeout, ws_opts) {
-    (0, _assertArgs.default)(arguments, {
+    var _this2 = this;
+
+    (0, _assertArgs["default"])(arguments, {
       "method": "string",
       "[params]": ["object", Array],
       "[timeout]": "number",
       "[ws_opts]": "object"
     });
 
-    if (!ws_opts && "object" === typeof timeout) {
+    if (!ws_opts && "object" === (0, _typeof2["default"])(timeout)) {
       ws_opts = timeout;
       timeout = null;
     }
 
-    return new Promise((resolve, reject) => {
-      if (!this.ready) return reject(new Error("socket not ready"));
-      const rpc_id = this.generate_request_id(method, params);
-      const message = {
+    return new Promise(function (resolve, reject) {
+      if (!_this2.ready) return reject(new Error("socket not ready"));
+
+      var rpc_id = _this2.generate_request_id(method, params);
+
+      var message = {
         jsonrpc: "2.0",
         method: method,
         params: params || null,
         id: rpc_id
       };
-      this.socket.send(JSON.stringify(message), ws_opts, error => {
+
+      _this2.socket.send(JSON.stringify(message), ws_opts, function (error) {
         if (error) return reject(error);
-        this.queue[rpc_id] = {
+        _this2.queue[rpc_id] = {
           promise: [resolve, reject]
         };
 
         if (timeout) {
-          this.queue[rpc_id].timeout = setTimeout(() => {
-            this.queue[rpc_id] = null;
+          _this2.queue[rpc_id].timeout = setTimeout(function () {
+            _this2.queue[rpc_id] = null;
             reject(new Error("reply timeout"));
           }, timeout);
         }
@@ -119,8 +141,27 @@ class CommonClient extends _eventemitter.default {
    */
 
 
-  async login(params) {
-    return await this.call("rpc.login", params);
+  login(params) {
+    var _this3 = this;
+
+    return function _callee() {
+      return _regenerator["default"].async(function _callee$(_context) {
+        while (1) {
+          switch (_context.prev = _context.next) {
+            case 0:
+              _context.next = 2;
+              return _regenerator["default"].awrap(_this3.call("rpc.login", params));
+
+            case 2:
+              return _context.abrupt("return", _context.sent);
+
+            case 3:
+            case "end":
+              return _context.stop();
+          }
+        }
+      });
+    }();
   }
   /**
    * Fetches a list of client's methods registered on server.
@@ -129,8 +170,27 @@ class CommonClient extends _eventemitter.default {
    */
 
 
-  async listMethods() {
-    return await this.call("__listMethods");
+  listMethods() {
+    var _this4 = this;
+
+    return function _callee2() {
+      return _regenerator["default"].async(function _callee2$(_context2) {
+        while (1) {
+          switch (_context2.prev = _context2.next) {
+            case 0:
+              _context2.next = 2;
+              return _regenerator["default"].awrap(_this4.call("__listMethods"));
+
+            case 2:
+              return _context2.abrupt("return", _context2.sent);
+
+            case 3:
+            case "end":
+              return _context2.stop();
+          }
+        }
+      });
+    }();
   }
   /**
    * Sends a JSON-RPC 2.0 notification to server.
@@ -142,18 +202,21 @@ class CommonClient extends _eventemitter.default {
 
 
   notify(method, params) {
-    (0, _assertArgs.default)(arguments, {
+    var _this5 = this;
+
+    (0, _assertArgs["default"])(arguments, {
       "method": "string",
       "[params]": ["object", Array]
     });
-    return new Promise((resolve, reject) => {
-      if (!this.ready) return reject(new Error("socket not ready"));
-      const message = {
+    return new Promise(function (resolve, reject) {
+      if (!_this5.ready) return reject(new Error("socket not ready"));
+      var message = {
         jsonrpc: "2.0",
         method: method,
         params: params || null
       };
-      this.socket.send(JSON.stringify(message), error => {
+
+      _this5.socket.send(JSON.stringify(message), function (error) {
         if (error) return reject(error);
         resolve();
       });
@@ -168,14 +231,43 @@ class CommonClient extends _eventemitter.default {
    */
 
 
-  async subscribe(event) {
-    (0, _assertArgs.default)(arguments, {
-      event: ["string", Array]
-    });
-    if (typeof event === "string") event = [event];
-    const result = await this.call("rpc.on", event);
-    if (typeof event === "string" && result[event] !== "ok") throw new Error("Failed subscribing to an event '" + event + "' with: " + result[event]);
-    return result;
+  subscribe(event) {
+    var _arguments = arguments,
+        _this6 = this;
+
+    return function _callee3() {
+      var result;
+      return _regenerator["default"].async(function _callee3$(_context3) {
+        while (1) {
+          switch (_context3.prev = _context3.next) {
+            case 0:
+              (0, _assertArgs["default"])(_arguments, {
+                event: ["string", Array]
+              });
+              if (typeof event === "string") event = [event];
+              _context3.next = 4;
+              return _regenerator["default"].awrap(_this6.call("rpc.on", event));
+
+            case 4:
+              result = _context3.sent;
+
+              if (!(typeof event === "string" && result[event] !== "ok")) {
+                _context3.next = 7;
+                break;
+              }
+
+              throw new Error("Failed subscribing to an event '" + event + "' with: " + result[event]);
+
+            case 7:
+              return _context3.abrupt("return", result);
+
+            case 8:
+            case "end":
+              return _context3.stop();
+          }
+        }
+      });
+    }();
   }
   /**
    * Unsubscribes from a defined event.
@@ -186,14 +278,43 @@ class CommonClient extends _eventemitter.default {
    */
 
 
-  async unsubscribe(event) {
-    (0, _assertArgs.default)(arguments, {
-      event: ["string", Array]
-    });
-    if (typeof event === "string") event = [event];
-    const result = await this.call("rpc.off", event);
-    if (typeof event === "string" && result[event] !== "ok") throw new Error("Failed unsubscribing from an event with: " + result);
-    return result;
+  unsubscribe(event) {
+    var _arguments2 = arguments,
+        _this7 = this;
+
+    return function _callee4() {
+      var result;
+      return _regenerator["default"].async(function _callee4$(_context4) {
+        while (1) {
+          switch (_context4.prev = _context4.next) {
+            case 0:
+              (0, _assertArgs["default"])(_arguments2, {
+                event: ["string", Array]
+              });
+              if (typeof event === "string") event = [event];
+              _context4.next = 4;
+              return _regenerator["default"].awrap(_this7.call("rpc.off", event));
+
+            case 4:
+              result = _context4.sent;
+
+              if (!(typeof event === "string" && result[event] !== "ok")) {
+                _context4.next = 7;
+                break;
+              }
+
+              throw new Error("Failed unsubscribing from an event with: " + result);
+
+            case 7:
+              return _context4.abrupt("return", result);
+
+            case 8:
+            case "end":
+              return _context4.stop();
+          }
+        }
+      });
+    }();
   }
   /**
    * Closes a WebSocket connection gracefully.
@@ -218,54 +339,62 @@ class CommonClient extends _eventemitter.default {
 
 
   _connect(address, options) {
+    var _this8 = this;
+
     this.socket = new this.WebSocketConstructible(address, options);
-    this.socket.addEventListener("open", () => {
-      this.ready = true;
-      this.emit("open");
-      this.current_reconnects = 0;
+    this.socket.addEventListener("open", function () {
+      _this8.ready = true;
+
+      _this8.emit("open");
+
+      _this8.current_reconnects = 0;
     });
-    this.socket.addEventListener("message", ({
-      data: message
-    }) => {
+    this.socket.addEventListener("message", function (_ref2) {
+      var message = _ref2.data;
       if (message instanceof ArrayBuffer) message = Buffer.from(message).toString();
 
       try {
-        message = _circularJson.default.parse(message);
+        message = _circularJson["default"].parse(message);
       } catch (error) {
         return;
       } // check if any listeners are attached and forward event
 
 
-      if (message.notification && this.listeners(message.notification).length) {
-        if (!Object.keys(message.params).length) return this.emit(message.notification);
-        const args = [message.notification];
+      if (message.notification && _this8.listeners(message.notification).length) {
+        if (!Object.keys(message.params).length) return _this8.emit(message.notification);
+        var args = [message.notification];
         if (message.params.constructor === Object) args.push(message.params);else // using for-loop instead of unshift/spread because performance is better
-          for (let i = 0; i < message.params.length; i++) args.push(message.params[i]);
-        return this.emit.apply(this, args);
+          for (var i = 0; i < message.params.length; i++) {
+            args.push(message.params[i]);
+          }
+        return _this8.emit.apply(_this8, args);
       }
 
-      if (!this.queue[message.id]) {
+      if (!_this8.queue[message.id]) {
         // general JSON RPC 2.0 events
-        if (message.method && message.params) return this.emit(message.method, message.params);else return;
+        if (message.method && message.params) return _this8.emit(message.method, message.params);else return;
       }
 
-      if (this.queue[message.id].timeout) clearTimeout(this.queue[message.id].timeout);
-      if (message.error) this.queue[message.id].promise[1](message.error);else this.queue[message.id].promise[0](message.result);
-      this.queue[message.id] = null;
+      if (_this8.queue[message.id].timeout) clearTimeout(_this8.queue[message.id].timeout);
+      if (message.error) _this8.queue[message.id].promise[1](message.error);else _this8.queue[message.id].promise[0](message.result);
+      _this8.queue[message.id] = null;
     });
-    this.socket.addEventListener("error", error => this.emit("error", error));
-    this.socket.addEventListener("close", ({
-      code,
-      reason
-    }) => {
-      if (this.ready) this.emit("close", code, reason);
-      this.ready = false;
+    this.socket.addEventListener("error", function (error) {
+      return _this8.emit("error", error);
+    });
+    this.socket.addEventListener("close", function (_ref3) {
+      var code = _ref3.code,
+          reason = _ref3.reason;
+      if (_this8.ready) _this8.emit("close", code, reason);
+      _this8.ready = false;
       if (code === 1000) return;
-      this.current_reconnects++;
-      if (this.reconnect && (this.max_reconnects > this.current_reconnects || this.max_reconnects === 0)) setTimeout(() => this._connect(address, options), this.reconnect_interval);
+      _this8.current_reconnects++;
+      if (_this8.reconnect && (_this8.max_reconnects > _this8.current_reconnects || _this8.max_reconnects === 0)) setTimeout(function () {
+        return _this8._connect(address, options);
+      }, _this8.reconnect_interval);
     });
   }
 
 }
 
-exports.default = CommonClient;
+exports["default"] = CommonClient;

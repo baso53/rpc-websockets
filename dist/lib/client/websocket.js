@@ -6,15 +6,15 @@ var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefau
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = void 0;
+exports["default"] = void 0;
 
 var _ws = _interopRequireDefault(require("ws"));
 
-class NodeWebSocketImpl extends _ws.default {
+class NodeWebSocketImpl extends _ws["default"] {
   constructor(address, options) {
     super(address, options);
   }
 
 }
 
-exports.default = NodeWebSocketImpl;
+exports["default"] = NodeWebSocketImpl;

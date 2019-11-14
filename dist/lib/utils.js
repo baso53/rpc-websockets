@@ -4,7 +4,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.createError = createError;
-const errors = new Map([[-32000, "Event not provided"], [-32600, "Invalid Request"], [-32601, "Method not found"], [-32602, "Invalid params"], [-32603, "Internal error"], [-32604, "Params not found"], [-32605, "Method forbidden"], [-32700, "Parse error"]]);
+var errors = new Map([[-32000, "Event not provided"], [-32600, "Invalid Request"], [-32601, "Method not found"], [-32602, "Invalid params"], [-32603, "Internal error"], [-32604, "Params not found"], [-32605, "Method forbidden"], [-32700, "Parse error"]]);
 /**
  * Creates a JSON-RPC 2.0-compliant error.
  * @param {Number} code - error code
@@ -13,7 +13,7 @@ const errors = new Map([[-32000, "Event not provided"], [-32600, "Invalid Reques
  */
 
 function createError(code, details) {
-  const error = {
+  var error = {
     code: code,
     message: errors.get(code) || "Internal Server Error"
   };
